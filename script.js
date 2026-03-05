@@ -73,7 +73,7 @@ if (startBtn) {
 function resetVoiceUI() {
     if (!startBtn) return;
     startBtn.innerText = (currentLang === 'te-IN') ? "మాట్లాడండి" : 
-                        (currentLang === 'hi-IN') ? "बात करने के लिए टैप करें" : "🎤 Tap to Speak";
+                        (currentLang === 'hi-IN') ? "बात करने के लिएタップ करें" : "🎤 Tap to Speak";
     startBtn.style.background = ""; 
 }
 
@@ -97,6 +97,7 @@ function stopEmergencySiren() {
     document.body.classList.remove('emergency-flash');
 }
 
+// FIXED: Correct Template Literal for SOS SMS
 function sendSOSMessage(reason) {
     const contactNumber = "108"; 
     const mapsLink = `https://www.google.com/maps?q=${rawCoords.lat},${rawCoords.lon}`;
@@ -127,7 +128,7 @@ function removeSymptom(index) {
     updateChips();
 }
 
-// 🧠 LOCAL AI ANALYSIS (Fixed: No Backend Needed)
+// 🧠 LOCAL AI ANALYSIS (Kept your logic)
 const analyzeBtn = document.getElementById("analyze-btn");
 if(analyzeBtn) analyzeBtn.onclick = () => {
     if (symptoms.length === 0) return alert("Please add symptoms first!");
@@ -135,7 +136,6 @@ if(analyzeBtn) analyzeBtn.onclick = () => {
     const resultArea = document.getElementById("result");
     resultArea.innerHTML = `<div class="loader-container"><div class="heart-pulse">❤️</div><p>Scanning Risks...</p></div>`;
     
-    // Theoretical Logic Processing
     setTimeout(() => {
         const symptomsStr = symptoms.join(" ").toLowerCase();
         let severity = "LOW";
@@ -152,13 +152,13 @@ if(analyzeBtn) analyzeBtn.onclick = () => {
         renderResult({
             severity: severity,
             analysis: analysis,
-            hospital: "Primary Health Centre",
+            hospital: "Nearest Emergency Hospital",
             h_phone: "108"
         });
     }, 1500); 
 };
 
-// 📊 RENDERING RESULTS
+// 📊 RENDERING RESULTS (Updated Navigation Logic)
 function renderResult(data) {
     const resultArea = document.getElementById("result");
     const severity = data.severity || "LOW"; 
@@ -166,13 +166,17 @@ function renderResult(data) {
     if (severity === "EMERGENCY") triggerGlobalEmergency("Critical Symptoms Detected"); 
     else stopEmergencySiren();
 
+    // FIXED: Navigation URL to search for the nearest hospital based on current location
+    const navUrl = `https://www.google.com/maps/search/hospital/@${rawCoords.lat},${rawCoords.lon},15z`;
+
     resultArea.innerHTML = `
         <div class="glass-card result-card ${severity.toLowerCase()}">
             <h3 style="margin:0;">📋 Analysis: ${severity}</h3>
             <p style="line-height:1.6; margin: 15px 0;">${data.analysis}</p>
             <div id="emergency-hub" style="display:block; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
-                <p>🏥 Nearby: ${data.hospital}</p>
+                <p>🏥 Facility: ${data.hospital}</p>
                 <button class="emergency-btn" onclick="window.location.href='tel:${data.h_phone}'">📞 Call Help</button>
+                <button class="emergency-btn" style="background:#10b981; margin-top:10px;" onclick="window.open('${navUrl}', '_blank')">📍 Navigate to Hospital</button>
             </div>
         </div>`;
     speakResult(data.analysis);
