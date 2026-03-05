@@ -73,7 +73,7 @@ if (startBtn) {
 function resetVoiceUI() {
     if (!startBtn) return;
     startBtn.innerText = (currentLang === 'te-IN') ? "మాట్లాడండి" : 
-                        (currentLang === 'hi-IN') ? "बात करने के लिएタップ करें" : "🎤 Tap to Speak";
+                        (currentLang === 'hi-IN') ? "बात करने के लिए टैप करें" : "🎤 Tap to Speak";
     startBtn.style.background = ""; 
 }
 
@@ -97,9 +97,9 @@ function stopEmergencySiren() {
     document.body.classList.remove('emergency-flash');
 }
 
-// FIXED: Correct Template Literal for SOS SMS
 function sendSOSMessage(reason) {
     const contactNumber = "108"; 
+    // Updated Template Literal for SOS SMS
     const mapsLink = `https://www.google.com/maps?q=${rawCoords.lat},${rawCoords.lon}`;
     const messageBody = `🆘 EMERGENCY SOS\nReason: ${reason}\nLoc: ${locationStr}\nMap: ${mapsLink}`;
     window.location.href = `sms:${contactNumber}?body=${encodeURIComponent(messageBody)}`;
@@ -128,7 +128,7 @@ function removeSymptom(index) {
     updateChips();
 }
 
-// 🧠 LOCAL AI ANALYSIS (Kept your logic)
+// 🧠 LOCAL AI ANALYSIS
 const analyzeBtn = document.getElementById("analyze-btn");
 if(analyzeBtn) analyzeBtn.onclick = () => {
     if (symptoms.length === 0) return alert("Please add symptoms first!");
@@ -158,7 +158,7 @@ if(analyzeBtn) analyzeBtn.onclick = () => {
     }, 1500); 
 };
 
-// 📊 RENDERING RESULTS (Updated Navigation Logic)
+// 📊 RENDERING RESULTS (Fixed Dynamic Map Search)
 function renderResult(data) {
     const resultArea = document.getElementById("result");
     const severity = data.severity || "LOW"; 
@@ -166,8 +166,8 @@ function renderResult(data) {
     if (severity === "EMERGENCY") triggerGlobalEmergency("Critical Symptoms Detected"); 
     else stopEmergencySiren();
 
-    // FIXED: Navigation URL to search for the nearest hospital based on current location
-    const navUrl = `https://www.google.com/maps/search/hospital/@${rawCoords.lat},${rawCoords.lon},15z`;
+    // THIS LINK GENERATES A REAL SEARCH FOR HOSPITALS NEAR YOUR GPS
+    const mapSearchUrl = `https://www.google.com/maps/search/hospitals/@${rawCoords.lat},${rawCoords.lon},14z`;
 
     resultArea.innerHTML = `
         <div class="glass-card result-card ${severity.toLowerCase()}">
@@ -176,7 +176,10 @@ function renderResult(data) {
             <div id="emergency-hub" style="display:block; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
                 <p>🏥 Facility: ${data.hospital}</p>
                 <button class="emergency-btn" onclick="window.location.href='tel:${data.h_phone}'">📞 Call Help</button>
-                <button class="emergency-btn" style="background:#10b981; margin-top:10px;" onclick="window.open('${navUrl}', '_blank')">📍 Navigate to Hospital</button>
+                <button class="emergency-btn" style="background:#10b981; margin-top:10px;" 
+                        onclick="window.open('${mapSearchUrl}', '_blank')">
+                        📍 Navigate to Nearby Hospitals
+                </button>
             </div>
         </div>`;
     speakResult(data.analysis);
